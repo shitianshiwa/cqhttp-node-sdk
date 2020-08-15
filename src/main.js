@@ -23,7 +23,7 @@ module.exports = class CQHttp extends Callable {
         this.callbacks = { message: [], event: [], notice: [], request: [] };
     }
 
-    handle (ctx) {
+    handle(ctx) {
         if (this.secret) {
             // check signature
             ctx.assert(ctx.request.headers['x-signature'] !== undefined, 401);
@@ -49,11 +49,20 @@ module.exports = class CQHttp extends Callable {
         ctx.response.body = JSON.stringify(result);
     }
 
-    on (post_type, callback) {
+    on(post_type, callback) {
         this.callbacks[post_type].push(callback);
+        return callback;
     }
 
-    __call__ (action, params = {}) {
+    delete(post_type, callback) {
+        let idx = this.callbacks[post_type].indexOf(callback);
+        while (idx > -1) {
+            this.callbacks[post_type].splice(idx, 1);
+            idx = this.callbacks[post_type].indexOf(callback);
+        }
+    }
+
+    __call__(action, params = {}) {
         if (this.apiClient) {
             return this.apiClient.post(`/${action}`, params).then(response => {
                 let err = {
@@ -73,7 +82,7 @@ module.exports = class CQHttp extends Callable {
         }
     }
 
-    listen (...args) {
+    listen(...args) {
         this.app.listen(...args);
     }
 }
