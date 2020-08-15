@@ -74,7 +74,7 @@ module.exports = class CQHttp extends Callable {
                         err.retcode = data.retcode;
                         return Promise.reject(err);
                     }
-                    return Promise.resolve(data.data);
+                    return Promise.resolve(data);
                 } else {
                     return Promise.reject(err);
                 }
